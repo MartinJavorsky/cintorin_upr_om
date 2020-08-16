@@ -378,7 +378,7 @@ DO WHILE .not.FEOF(lZdroj)
            		APPEND FROM ARRAY Riadok                                    
 
            		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=1"
+              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=1.5"
             	ELSE
               		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
            		ENDIF   
