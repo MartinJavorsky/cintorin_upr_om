@@ -268,7 +268,8 @@ DO WHILE .not.FEOF(lZdroj)
            ENDIF 
 
       CASE "&T" $ cRiadok AND "HROBY"$cVrstva
-           Riadok(1)=STRTRAN(cRiadok,"F=2 H=2","F=12 H=3")
+           
+           Riadok(1)=LEFT(cRiadok,AT(" ",cRiadok,4)) + "D=8 F=4 H=2.8 M=0.8"
            SELECT 1
            APPEND FROM ARRAY Riadok 
 
@@ -281,16 +282,20 @@ DO WHILE .not.FEOF(lZdroj)
       
       CASE "&T" $ cRiadok AND "&O 11" $ cVrstva
 
-           IF NOT ("chodn"$cRiadok OR "kamen"$cRiadok OR "zámk"$cRiadok OR "bet"$cRiadok OR "cesta"$cRiadok OR "dl"$cRiadok OR "asf"$cRiadok)
+           IF NOT ("CHODN"$UPPER(cRiadok) OR "KAMEN"$UPPER(cRiadok) OR "ZÁMK"$UPPER(cRiadok) OR "BET"$UPPER(cRiadok) OR "CESTA"$UPPER(cRiadok) OR "DL"$UPPER(cRiadok) OR "ASF"$UPPER(cRiadok))
               Riadok(1)="&O TEXT 1"
            	  SELECT 1
            	  APPEND FROM ARRAY Riadok
            	  cUhol=SUBSTR(cRiadok,AT("U=",cRiadok),8)
-              Riadok(1)=SUBSTR(cRiadok,1,AT("D=",cRiadok)-1)+" D=8 F=13 H=5 "+cUhol
+           	  cText=SUBSTR(cRiadok,AT("'",cRiadok,1),AT("'",cRiadok,2)-AT("'",cRiadok,1)+1)
+           	  IF "SM"$UPPER(cText)
+           	     cText = ALLTRIM(LEFT(cText,AT("SM",UPPER(cText))-1)+"smútku'")
+           	  ENDIF 
+              Riadok(1)=SUBSTR(cRiadok,1,AT("'",cRiadok,1)-1)+cText+" D=8 F=13 H=5 "+cUhol
               APPEND FROM ARRAY Riadok  
 		   ENDIF 
       CASE "&T" $ cRiadok AND "12" $ cVrstva
-           Riadok(1)=SUBSTR(cRiadok,1,AT("'",cRiadok,2))+" D=2 F=12 H=7"
+           Riadok(1)=UPPER(SUBSTR(cRiadok,1,AT("'",cRiadok,2))+" D=2 F=12 H=7")
            SELECT 1
            APPEND FROM ARRAY Riadok                                                                               
 
@@ -303,127 +308,141 @@ DO WHILE .not.FEOF(lZdroj)
            
          DO CASE 
            CASE "S=171" $ cRiadok &&AND "21"$cVrstva
-              Riadok(1)="&O VCHOD 1"
+                Riadok(1)="&O VCHOD 1"
+           		
            		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=3"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				
+				cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+ cRiadok + "S=171 M=3"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
            
            CASE "S=498" $ cRiadok OR "S=499" $ cRiadok OR "S=506" $ cRiadok OR "S=220" $ cRiadok 
-              Riadok(1)="&O SVETLO 1"
+                Riadok(1)="&O SVETLO 1"
 
           		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=2.5"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				
+				cSymbol = SUBSTR(cRiadok,AT("S=",cRiadok),5)
+           		cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+ cRiadok + cSymbol + " M=2.5"
+            	*ELSE
+              	*Riadok(1)="&L P "+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
                       
            CASE "S=51" $ cRiadok OR "S=50" $ cRiadok 
-              Riadok(1)="&O KRIZ 1"
+                Riadok(1)="&O KRIZ 1"
 
           		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=5"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				
+				cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+cRiadok + "S=51 M=4"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
                            
            CASE "S=128" $ cRiadok OR "S=129" $ cRiadok 
-              Riadok(1)="&O VODA 1"
+                Riadok(1)="&O VODA 1"
             
           		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=3"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+cRiadok + "S=128 M=3"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
 
-           CASE "S=35" $ cRiadok OR "S=36" $ cRiadok OR "S=39" $ cRiadok 
-              Riadok(1)="&O ZELEN 1"
+           CASE "S=35 " $ cRiadok OR "S=36 " $ cRiadok OR "S=39 " $ cRiadok 
+                Riadok(1)="&O ZELEN 1"
  
           		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=2"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				
+				cSymbol = SUBSTR(cRiadok,AT("S=",cRiadok),4)
+           		cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+ cRiadok + cSymbol + " M=2"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                     
                              
            CASE "S=211" $ cRiadok 
-              Riadok(1)="&O LAVICKA 1"
+                Riadok(1)="&O LAVICKA 1"
 
           		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=1.5"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				
+				cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+cRiadok+ "S=211 M=1.5"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
               
            CASE "S=138" $ cRiadok OR "S=139" $ cRiadok OR "S=115" $ cRiadok OR "S=154" $ cRiadok
-              Riadok(1)="&O KANAL 1"
+                Riadok(1)="&O KANAL 1"
 
           		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(STRTRAN(cRiadok,"S=138","S=139"),5) + " M=3"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(STRTRAN(cRiadok,"S=138","S=139"),5)
-           		ENDIF   
+				
+				cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+cRiadok+"S=139 M=3"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(STRTRAN(cRiadok,"S=138","S=139"),5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
             
            CASE "S=101" $ cRiadok 
-              Riadok(1)="&O TABULA 1"
+                Riadok(1)="&O TABULA 1"
  
            		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=3"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				
+				cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+ cRiadok + "S=101 M=3"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
              
            CASE "S=58" $ cRiadok 
-              Riadok(1)="&O POMNIK 1"
+                Riadok(1)="&O POMNIK 1"
 
           		SELECT 1
            		APPEND FROM ARRAY Riadok                                    
-
-           		IF NOT " M=" $ cRiadok
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5) + " M=3"
-            	ELSE
-              		Riadok(1)="&L P"+SUBSTR(cRiadok,5)
-           		ENDIF   
+				
+				cRiadok = SUBSTR(SUBSTR(cRiadok,6),1,AT(" ",SUBSTR(cRiadok,6),2))
+           		*IF NOT " M=" $ cRiadok
+              	Riadok(1)="&L P "+cRiadok + "S=58 M=3"
+            	*ELSE
+              	*	Riadok(1)="&L P"+SUBSTR(cRiadok,5)
+           		*ENDIF   
            
            		APPEND FROM ARRAY Riadok                    
            
